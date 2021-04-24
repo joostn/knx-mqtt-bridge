@@ -116,6 +116,8 @@ let onKnxEvent = function (evt, dst, value, gad) {
     mqttClient.publish(topicPrefix + dst, mqttMessage, {
         retain: config.mqtt.retain || false
     });
+
+    // JN: also publish raw:
 }
 
 let knxConnection = knx.Connection(Object.assign({
@@ -134,7 +136,15 @@ let knxConnection = knx.Connection(Object.assign({
                groupAddresses[key].endpoint = endpoint;
                groupAddresses[key].unit = endpoint.dpt.subtype !== undefined ? endpoint.dpt.subtype.unit || '' : '';
                groupAddresses[key].endpoint.on('event', function(evt, value) {
-                   onKnxEvent(evt, key, value, groupAddresses[key]);
+                if(value === true)
+                {
+                    value = 1;
+                }
+                else if(value === false)
+                {
+                    value = 0;
+                }
+                onKnxEvent(evt, key, value, groupAddresses[key]);
                });
            }
         }
@@ -143,6 +153,17 @@ let knxConnection = knx.Connection(Object.assign({
           if (!(config.ignoreUnknownGroupAddresses || groupAddresses.hasOwnProperty(dst))) {
               onKnxEvent(evt, dst, value);
           }
+          const valueArray = [...value];
+          const jsonobj = {
+              "src": src,
+              "dst": dst,
+              "v": valueArray
+          };
+          mqttClient.publish("knxraw/" + dst, JSON.stringify(jsonobj), {
+
+            retain: config.mqtt.retain || false
+         });
+    
       }
   }}, config.knx.options));
 

@@ -27,7 +27,16 @@ exports.parse = function (knxGadFile, logger) {
                                 if (match === undefined || match == null) {
                                     logger.warn("Unrecognized datapoint %s", subs[k].attributes.DPTs);
                                 } else {
-                                    dpt = 'DPT' + match[1] + (match[3] !== undefined ? '.' + match[3].padStart(3,0) : '');
+                                    var v1 = match[1];
+                                    var v2 = match[3];
+                                    if(v1 == 3)
+                                    {
+                                        // JN: dimming, blinds: replace with 5.010 (unsigned 1 byte)
+                                        // otherwise we cannot read it (stringify generates "[Object]")
+                                        v1 = "3";
+                                        v2 = undefined;//"10";
+                                    }
+                                    dpt = 'DPT' + v1 + (v2 !== undefined ? '.' + v2.padStart(3,0) : '');
                                 }
                             }
                             addresses[subs[k].attributes.Address] = {
