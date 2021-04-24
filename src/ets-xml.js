@@ -33,8 +33,8 @@ exports.parse = function (knxGadFile, logger) {
                                     {
                                         // JN: dimming, blinds: replace with 5.010 (unsigned 1 byte)
                                         // otherwise we cannot read it (stringify generates "[Object]")
-                                        v1 = "3";
-                                        v2 = undefined;//"10";
+                                        v1 = "5";
+                                        v2 = "10";
                                     }
                                     dpt = 'DPT' + v1 + (v2 !== undefined ? '.' + v2.padStart(3,0) : '');
                                 }
